@@ -11,6 +11,9 @@ YELLOW = (255,255,0)
 ROW_COUNT = 6
 COLUMN_COUNT = 7
 
+PLAYER = 0
+AI = 1
+
 def create_board():
 	board = np.zeros((ROW_COUNT,COLUMN_COUNT))
 	return board
@@ -68,9 +71,67 @@ def draw_board(board):
 				pygame.draw.circle(screen, YELLOW, (int(c*SQUARESIZE+SQUARESIZE/2), height-int(r*SQUARESIZE+SQUARESIZE/2)), RADIUS)
 	pygame.display.update()
 
+# Begninning of AI bot functions
+# Bot function finds the best column to put the next piece
+def bot():
+	# Finds the valid placement options
+	valid_locations = []
+	for col in range(0, COLUMN_COUNT):
+		if is_valid_location(board, col):
+			valid_locations.append(col)
+	# print(valid_locations)
+	
+	# Using the valid placement options, find the best option using score
+	top_score = 0
+	best_col = 0
+
+	for i in valid_locations:
+		temp_score = get_score(board, i)
+		print(temp_score)
+		if temp_score >= top_score:
+			top_score = temp_score
+			best_col = i
+	
+	return best_col
+
+def get_score(board, col):
+	# Creating a temporary board, calculate score
+	# Dropping the piece onto the temporary board
+	score = 0
+	temp_board = board.copy()
+	row = get_next_open_row(temp_board, col)
+	drop_piece(temp_board, row, col, 2)
+
+	# ------- Calculate the top score -------
+
+	# Prioritize middle
+	if col == 3:
+		score += 5
+	elif col == 2 or col == 4:
+		score += 4
+	elif col == 1 or col == 5:
+		score += 3
+
+	# 4 in a row
+	if winning_move(temp_board, 2):
+		score += 1000
+
+	# 3 in a row
+	for c in range(COLUMN_COUNT-2):
+		for r in range(ROW_COUNT):
+			if temp_board[r][c] == 2 and temp_board[r][c+1] == 2 and temp_board[r][c+2] == 2:
+				score += 50
+
+	# 2 in a row
+	for c in range(COLUMN_COUNT-1):
+		for r in range(ROW_COUNT):
+			if temp_board[r][c] == 2 and temp_board[r][c+1] == 2:
+				score += 25
+
+	return score
 
 board = create_board()
-print_board(board)
+# print_board(board)
 game_over = False
 turn = 0
 
@@ -110,7 +171,7 @@ while not game_over:
 			pygame.draw.rect(screen, BLACK, (0,0, width, SQUARESIZE))
 			#print(event.pos)
 			# Ask for Player 1 Input
-			if turn == 0:
+			if turn == PLAYER:
 				posx = event.pos[0]
 				col = int(math.floor(posx/SQUARESIZE))
 
@@ -123,26 +184,29 @@ while not game_over:
 						screen.blit(label, (40,10))
 						game_over = True
 
+				
+			# AI Begins to play
+			# turn == AI:				
 
-			# # Ask for Player 2 Input
-			else:				
-				posx = event.pos[0]
-				col = int(math.floor(posx/SQUARESIZE))
-
+			# Minimax and Alpha Beta Pruning to find the best col 
+			#elif turn == AI:
+			if game_over == False: 
+				pygame.time.wait(100)
+				col = bot()
 				if is_valid_location(board, col):
 					row = get_next_open_row(board, col)
 					drop_piece(board, row, col, 2)
 
 					if winning_move(board, 2):
-						label = myfont.render("Player 2 wins!!", 1, YELLOW)
+						label = myfont.render("The AI wins!!", 1, YELLOW)
 						screen.blit(label, (40,10))
 						game_over = True
 
-			print_board(board)
+			# print_board(board)
 			draw_board(board)
 
-			turn += 1
-			turn = turn % 2
+			# turn += 1
+			# turn = turn % 2
 
 			if game_over:
-				pygame.time.wait(3000)
+				pygame.time.wait(2000)
