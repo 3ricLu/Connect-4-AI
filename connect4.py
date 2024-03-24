@@ -127,6 +127,36 @@ def get_score(board, col):
 		score += 4
 	elif col == 1 or col == 5:
 		score += 3
+	
+  # Blocking
+	# Check horizontal locations for win
+	for c in range(COLUMN_COUNT-3):
+		for r in range(ROW_COUNT):
+			if temp_board[r][c] == 1 and temp_board[r][c+1] == 1 and temp_board[r][c+2] == 1 and r == row and c+3 == col or (r == row and c == col and temp_board[r][c+1] == 1 and temp_board[r][c+2] == 1 and temp_board[r][c+3] == 1):
+				score += 500
+				
+	for c in range(COLUMN_COUNT-2):
+		for r in range(ROW_COUNT):
+			if temp_board[r][c] == 1 and temp_board[r][c+1] == 1 and r == row and c+2 == col:
+				score += 100
+
+	# Check vertical locations for win
+	for c in range(COLUMN_COUNT):
+		for r in range(ROW_COUNT-3):
+			if temp_board[r][c] == 1 and temp_board[r+1][c] == 1 and temp_board[r+2][c] == 1 and r+3 == row and c == col:
+				score += 500
+
+	# Check positively sloped diaganols
+	for c in range(COLUMN_COUNT-3):
+		for r in range(ROW_COUNT-3):
+			if temp_board[r][c] == 1 and temp_board[r+1][c+1] == 1 and temp_board[r+2][c+2] == 1 and r+3 == row and c+3 == col:
+				score += 500
+
+	# Check negatively sloped diaganols
+	for c in range(COLUMN_COUNT-3):
+		for r in range(3, ROW_COUNT):
+			if temp_board[r][c] == 1 and temp_board[r-1][c+1] == 1 and temp_board[r-2][c+2] == 1 and r-3 == row and c+3 == col:
+				score += 500
 
 	# 4 in a row
 	if winning_move(temp_board, 2):
