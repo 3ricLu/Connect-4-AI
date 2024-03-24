@@ -121,11 +121,41 @@ def get_score(board, col):
 		for r in range(ROW_COUNT):
 			if temp_board[r][c] == 2 and temp_board[r][c+1] == 2 and temp_board[r][c+2] == 2:
 				score += 50
+				
+	for c in range(COLUMN_COUNT):
+		for r in range(ROW_COUNT-2):
+			if temp_board[r][c] == 2 and temp_board[r+1][c] == 2 and temp_board[r+2][c] == 2:
+				score += 50
+				
+	for c in range(COLUMN_COUNT-2):
+		for r in range(ROW_COUNT-2):
+			if temp_board[r][c] == 2 and temp_board[r+1][c+1] == 2 and temp_board[r+2][c+2] == 2:
+				score += 50
 
+	for c in range(COLUMN_COUNT-2):
+		for r in range(3, ROW_COUNT):
+			if temp_board[r][c] == 2 and temp_board[r-1][c+1] == 2 and temp_board[r-2][c+2] == 2:
+				score += 50
+			
 	# 2 in a row
 	for c in range(COLUMN_COUNT-1):
 		for r in range(ROW_COUNT):
 			if temp_board[r][c] == 2 and temp_board[r][c+1] == 2:
+				score += 25
+				
+	for c in range(COLUMN_COUNT):
+		for r in range(ROW_COUNT-1):
+			if temp_board[r][c] == 2 and temp_board[r+1][c] == 2:
+				score += 25
+	
+	for c in range(COLUMN_COUNT-1):
+		for r in range(ROW_COUNT-1):
+			if temp_board[r][c] == 2 and temp_board[r+1][c+1] == 2:
+				score += 25
+				
+	for c in range(COLUMN_COUNT-1):
+		for r in range(3, ROW_COUNT):
+			if temp_board[r][c] == 2 and temp_board[r-1][c+1] == 2:
 				score += 25
 
 	return score
