@@ -13,20 +13,20 @@ COLUMN_COUNT = 7
 
 PLAYER = 0
 AI = 1
-class board():
-	def __init__(self,score=0,children=None,depth=0,turn=True):
-		self.score = score
-		self.children = children
-		self.depth=depth
-		self.turn=0
-		self.move=move
-	def summative_score(self):
-		while self.depth<3:
-			for c in self.children:
-				self.score+=self.summative_score(c)
-			return self.score
-	def create_children(self):
-		pass
+# class board():
+# 	def __init__(self,score=0,children=None,depth=0,turn=True):
+# 		self.score = score
+# 		self.children = children
+# 		self.depth=depth
+# 		self.turn=0
+# 		self.move=move
+# 	def summative_score(self):
+# 		while self.depth<3:
+# 			for c in self.children:
+# 				self.score+=self.summative_score(c)
+# 			return self.score
+# 	def create_children(self):
+# 		pass
 		
 		
 
@@ -102,7 +102,10 @@ def bot():
 	best_col = 0
 
 	for i in valid_locations:
-		temp_score = get_score(board, i)
+		temp_board = board.copy()
+		row = get_next_open_row(temp_board, i)
+		drop_piece(temp_board, row, i, 2)
+		temp_score = get_score(temp_board, 2, 1)
 		print(temp_score)
 		if temp_score >= top_score:
 			top_score = temp_score
@@ -110,104 +113,102 @@ def bot():
 	
 	return best_col
 
-def get_score(board, col):
+def get_score(board, piece, other_piece):
 	# Creating a temporary board, calculate score
 	# Dropping the piece onto the temporary board
 	score = 0
-	temp_board = board.copy()
-	row = get_next_open_row(temp_board, col)
-	drop_piece(temp_board, row, col, 2)
-
 	# ------- Calculate the top score -------
-
 	# Prioritize middle
-	if col == 3:
-		score += 5
-	elif col == 2 or col == 4:
-		score += 4
-	elif col == 1 or col == 5:
-		score += 3
-	
+	for c in range(COLUMN_COUNT):
+		for r in range(ROW_COUNT):
+			if board[r][c] == piece and c == 2:
+				score += 5
+			if board[r][c] == piece and (c == 2 or c == 4):
+				score += 3
+			if board[r][c] == piece and (c == 1 or c == 5):
+				score += 1
+				
+
   # Blocking
 	# Check horizontal locations for win
 	for c in range(COLUMN_COUNT-3):
 		for r in range(ROW_COUNT):
-			if temp_board[r][c] == 1 and temp_board[r][c+1] == 1 and temp_board[r][c+2] == 1 and r == row and c+3 == col or (r == row and c == col and temp_board[r][c+1] == 1 and temp_board[r][c+2] == 1 and temp_board[r][c+3] == 1):
+			if board[r][c] == other_piece and board[r][c+1] == other_piece and board[r][c+2] == other_piece and r == row and c+3 == col or (r == row and c == col and board[r][c+1] == other_piece and board[r][c+2] == other_piece and board[r][c+3] == other_piece):
 				score += 500
 				
 	for c in range(COLUMN_COUNT-2):
 		for r in range(ROW_COUNT):
-			if temp_board[r][c] == 1 and temp_board[r][c+1] == 1 and r == row and c+2 == col:
+			if board[r][c] == other_piece and board[r][c+1] == other_piece and r == row and c+2 == col:
 				score += 100
 
 	# Check vertical locations for win
 	for c in range(COLUMN_COUNT):
 		for r in range(ROW_COUNT-3):
-			if temp_board[r][c] == 1 and temp_board[r+1][c] == 1 and temp_board[r+2][c] == 1 and r+3 == row and c == col:
+			if board[r][c] == other_piece and board[r+1][c] == other_piece and board[r+2][c] == other_piece and r+3 == row and c == col:
 				score += 500
 
 	# Check positively sloped diaganols
 	for c in range(COLUMN_COUNT-3):
 		for r in range(ROW_COUNT-3):
-			if temp_board[r][c] == 1 and temp_board[r+1][c+1] == 1 and temp_board[r+2][c+2] == 1 and r+3 == row and c+3 == col:
+			if board[r][c] == other_piece and board[r+1][c+1] == other_piece and board[r+2][c+2] == other_piece and r+3 == row and c+3 == col:
 				score += 500
 
 	# Check negatively sloped diaganols
 	for c in range(COLUMN_COUNT-3):
 		for r in range(3, ROW_COUNT):
-			if temp_board[r][c] == 1 and temp_board[r-1][c+1] == 1 and temp_board[r-2][c+2] == 1 and r-3 == row and c+3 == col:
+			if board[r][c] == other_piece and board[r-1][c+1] == other_piece and board[r-2][c+2] == other_piece and r-3 == row and c+3 == col:
 				score += 500
 
 	# 4 in a row
-	if winning_move(temp_board, 2):
+	if winning_move(board, 2):
 		score += 1000
 
 	# 3 in a row
 	for c in range(COLUMN_COUNT-2):
 		for r in range(ROW_COUNT):
-			if temp_board[r][c] == 2 and temp_board[r][c+1] == 2 and temp_board[r][c+2] == 2:
+			if board[r][c] == piece and board[r][c+1] == piece and board[r][c+2] == piece:
 				score += 50
 				
 	for c in range(COLUMN_COUNT):
 		for r in range(ROW_COUNT-2):
-			if temp_board[r][c] == 2 and temp_board[r+1][c] == 2 and temp_board[r+2][c] == 2:
+			if board[r][c] == piece and board[r+1][c] == piece and board[r+2][c] == piece:
 				score += 50
 				
 	for c in range(COLUMN_COUNT-2):
 		for r in range(ROW_COUNT-2):
-			if temp_board[r][c] == 2 and temp_board[r+1][c+1] == 2 and temp_board[r+2][c+2] == 2:
+			if board[r][c] == piece and board[r+1][c+1] == piece and board[r+2][c+2] == piece:
 				score += 50
 
 	for c in range(COLUMN_COUNT-2):
 		for r in range(3, ROW_COUNT):
-			if temp_board[r][c] == 2 and temp_board[r-1][c+1] == 2 and temp_board[r-2][c+2] == 2:
+			if board[r][c] == piece and board[r-1][c+1] == piece and board[r-2][c+2] == piece:
 				score += 50
 			
 	# 2 in a row
 	for c in range(COLUMN_COUNT-1):
 		for r in range(ROW_COUNT):
-			if temp_board[r][c] == 2 and temp_board[r][c+1] == 2:
+			if board[r][c] == piece and board[r][c+1] == piece:
 				score += 25
 				
 	for c in range(COLUMN_COUNT):
 		for r in range(ROW_COUNT-1):
-			if temp_board[r][c] == 2 and temp_board[r+1][c] == 2:
+			if board[r][c] == piece and board[r+1][c] == piece:
 				score += 25
 	
 	for c in range(COLUMN_COUNT-1):
 		for r in range(ROW_COUNT-1):
-			if temp_board[r][c] == 2 and temp_board[r+1][c+1] == 2:
+			if board[r][c] == piece and board[r+1][c+1] == piece:
 				score += 25
 				
 	for c in range(COLUMN_COUNT-1):
 		for r in range(3, ROW_COUNT):
-			if temp_board[r][c] == 2 and temp_board[r-1][c+1] == 2:
+			if board[r][c] == piece and board[r-1][c+1] == piece:
 				score += 25
 
 	return score
 
 board = create_board()
-# print_board(board)
+print_board(board)
 game_over = False
 turn = 0
 
