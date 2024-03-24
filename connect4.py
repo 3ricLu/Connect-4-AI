@@ -13,6 +13,22 @@ COLUMN_COUNT = 7
 
 PLAYER = 0
 AI = 1
+class board():
+	def __init__(self,score=0,children=None,depth=0,turn=True):
+		self.score = score
+		self.children = children
+		self.depth=depth
+		self.turn=0
+		self.move=move
+	def summative_score(self):
+		while self.depth<3:
+			for c in self.children:
+				self.score+=self.summative_score(c)
+			return self.score
+	def create_children(self):
+		pass
+		
+		
 
 def create_board():
 	board = np.zeros((ROW_COUNT,COLUMN_COUNT))
