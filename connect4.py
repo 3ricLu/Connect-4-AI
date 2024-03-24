@@ -12,7 +12,6 @@ ROW_COUNT = 6
 COLUMN_COUNT = 7
 
 PLAYER = 0
-<<<<<<< Updated upstream
 AI = 1
 # class board():
 # 	def __init__(self,score=0,children=None,depth=0,turn=True):
@@ -29,9 +28,6 @@ AI = 1
 # 	def create_children(self):
 # 		pass
 		
-=======
-AI = 1		
->>>>>>> Stashed changes
 		
 
 def create_board():
@@ -43,14 +39,6 @@ def drop_piece(board, row, col, piece):
 
 def is_valid_location(board, col):
 	return board[ROW_COUNT-1][col] == 0
-
-def tie_game(board):
-	tie_game=True
-	for y in board:
-		for x in y:
-			if x<1:
-				tie_game=False
-	return tie_game
 
 def get_next_open_row(board, col):
 	for r in range(ROW_COUNT):
@@ -125,12 +113,7 @@ def bot():
 	
 	return best_col
 
-<<<<<<< Updated upstream
 def get_score(board, piece, other_piece):
-=======
-
-def get_score(board, col):
->>>>>>> Stashed changes
 	# Creating a temporary board, calculate score
 	# Dropping the piece onto the temporary board
 	score = 0
@@ -223,9 +206,6 @@ def get_score(board, col):
 				score += 25
 
 	return score
-
-def terminal_node(board):
-	return winning_move(board, 1) or winning_move(board, 2) or tie_game
 
 board = create_board()
 print_board(board)
