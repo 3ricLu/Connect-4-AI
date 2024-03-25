@@ -12,22 +12,7 @@ ROW_COUNT = 6
 COLUMN_COUNT = 7
 
 PLAYER = 0
-AI = 1
-# class board():
-# 	def __init__(self,score=0,children=None,depth=0,turn=True):
-# 		self.score = score
-# 		self.children = children
-# 		self.depth=depth
-# 		self.turn=0
-# 		self.move=move
-# 	def summative_score(self):
-# 		while self.depth<3:
-# 			for c in self.children:
-# 				self.score+=self.summative_score(c)
-# 			return self.score
-# 	def create_children(self):
-# 		pass
-		
+AI = 1		
 		
 
 def create_board():
@@ -39,6 +24,14 @@ def drop_piece(board, row, col, piece):
 
 def is_valid_location(board, col):
 	return board[ROW_COUNT-1][col] == 0
+
+def tie_game(board):
+	tie_game=True
+	for y in board:
+		for x in y:
+			if x<1:
+				tie_game=False
+	return tie_game
 
 def get_next_open_row(board, col):
 	for r in range(ROW_COUNT):
@@ -86,6 +79,13 @@ def draw_board(board):
 			elif board[r][c] == 2: 
 				pygame.draw.circle(screen, YELLOW, (int(c*SQUARESIZE+SQUARESIZE/2), height-int(r*SQUARESIZE+SQUARESIZE/2)), RADIUS)
 	pygame.display.update()
+
+def valid_columns(board):
+	valid_locations = []
+	for col in range(0, COLUMN_COUNT):
+		if is_valid_location(board, col):
+			valid_locations.append(col)
+	return valid_locations
 
 # Begninning of AI bot functions
 # Bot function finds the best column to put the next piece
@@ -207,8 +207,54 @@ def get_score(board, piece, other_piece):
 
 	return score
 
+
+def terminal_board(board):
+	return winning_move(board, 1) or winning_move(board, 2) or tie_game(board)
+
+
+def minimax(board,depth,bot_turn):
+	valid_locations = valid_columns(board)
+	if depth==0 or terminal_board(board):
+		if terminal_board(board):
+			if winning_move(board, 1):
+				return (None,-math.inf)
+			elif winning_move(board, 2):
+				return (None, math.inf)
+			else:
+				return (None, 0)
+		else:
+			return (None,get_score(board,1,2))
+		
+	elif bot_turn:
+		value=-math.inf
+		column=valid_locations[0]
+		for col in valid_locations:
+			row = get_next_open_row(board,col)
+			temp=board.copy()
+			drop_piece(temp, row, col, 2)
+			total_score = minimax(temp, depth-1, False)[1]
+			if total_score>value:
+				value=total_score
+				column=col
+		return column, value
+		
+	elif not bot_turn:
+		value = math.inf
+		column=valid_locations[0]
+		for col in valid_locations:
+			row = get_next_open_row(board,col)
+			temp=board.copy()
+			drop_piece(temp, row, col, 1)
+			total_score = minimax(temp, depth-1, True)[1]
+			if total_score<value:
+				value=total_score
+				column=col
+		return column, value
+
+
+
 board = create_board()
-print_board(board)
+# print_board(board)
 game_over = False
 turn = 0
 
@@ -269,7 +315,7 @@ while not game_over:
 			#elif turn == AI:
 			if game_over == False: 
 				pygame.time.wait(100)
-				col = bot()
+				col = minimax(board,4, True)[0]
 				if is_valid_location(board, col):
 					row = get_next_open_row(board, col)
 					drop_piece(board, row, col, 2)
