@@ -122,11 +122,11 @@ def get_score(board, piece, other_piece):
 	for c in range(COLUMN_COUNT):
 		for r in range(ROW_COUNT):
 			if board[r][c] == piece and c == 2:
-				score += 5
+				score += 25
 			if board[r][c] == piece and (c == 2 or c == 4):
-				score += 3
+				score += 15
 			if board[r][c] == piece and (c == 1 or c == 5):
-				score += 1
+				score += 10
 				
 
   # Blocking
@@ -204,7 +204,7 @@ def get_score(board, piece, other_piece):
 		for r in range(3, ROW_COUNT):
 			if board[r][c] == piece and board[r-1][c+1] == piece:
 				score += 25
-
+	print(score)
 	return score
 
 
