@@ -134,34 +134,34 @@ def get_score(board, piece, other_piece):
 	for c in range(COLUMN_COUNT-3):
 		for r in range(ROW_COUNT):
 			if board[r][c] == other_piece and board[r][c+1] == other_piece and board[r][c+2] == other_piece and r == row and c+3 == col or (r == row and c == col and board[r][c+1] == other_piece and board[r][c+2] == other_piece and board[r][c+3] == other_piece):
-				score += 500
+				score += 1000
 				
 	for c in range(COLUMN_COUNT-2):
 		for r in range(ROW_COUNT):
 			if board[r][c] == other_piece and board[r][c+1] == other_piece and r == row and c+2 == col:
-				score += 100
+				score += 1000
 
 	# Check vertical locations for win
 	for c in range(COLUMN_COUNT):
 		for r in range(ROW_COUNT-3):
 			if board[r][c] == other_piece and board[r+1][c] == other_piece and board[r+2][c] == other_piece and r+3 == row and c == col:
-				score += 500
+				score += 1000
 
 	# Check positively sloped diaganols
 	for c in range(COLUMN_COUNT-3):
 		for r in range(ROW_COUNT-3):
 			if board[r][c] == other_piece and board[r+1][c+1] == other_piece and board[r+2][c+2] == other_piece and r+3 == row and c+3 == col:
-				score += 500
+				score += 1000
 
 	# Check negatively sloped diaganols
 	for c in range(COLUMN_COUNT-3):
 		for r in range(3, ROW_COUNT):
 			if board[r][c] == other_piece and board[r-1][c+1] == other_piece and board[r-2][c+2] == other_piece and r-3 == row and c+3 == col:
-				score += 500
+				score += 1000
 
 	# 4 in a row
 	if winning_move(board, 2):
-		score += 1000
+		score += 10000
 
 	# 3 in a row
 	for c in range(COLUMN_COUNT-2):
